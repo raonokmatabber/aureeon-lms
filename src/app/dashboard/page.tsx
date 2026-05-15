@@ -135,6 +135,13 @@ export default function DashboardPage() {
 
         </div>
       </div>
+      <style>{`
+        @media (max-width: 768px) {
+          .stats-grid { grid-template-columns: 1fr 1fr !important; }
+          .main-grid { grid-template-columns: 1fr !important; }
+          .welcome-banner { flex-direction: column !important; }
+        }
+      `}</style>
     </div>
   )
 }
