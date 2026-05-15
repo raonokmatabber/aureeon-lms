@@ -1,5 +1,6 @@
 'use client'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
 const stats = [
   { label: 'Active Courses', value: '6', delta: '+1 this week', color: '#6C63FF', icon: '📚' },
@@ -32,60 +33,69 @@ const activity = [
 export default function DashboardPage() {
   const h = new Date().getHours()
   const greet = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening'
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   return (
     <div>
       {/* Welcome */}
-      <div style={{ background: 'linear-gradient(135deg,rgba(108,99,255,0.15),rgba(67,207,170,0.08))', border: '1px solid var(--border-default)', borderRadius: 16, padding: '28px 32px', marginBottom: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ background: 'linear-gradient(135deg,rgba(108,99,255,0.15),rgba(67,207,170,0.08))', border: '1px solid var(--border-default)', borderRadius: 16, padding: isMobile ? '20px 20px' : '28px 32px', marginBottom: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 4 }}>{greet},</p>
-          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8 }}>Rafiq Islam 👋</h2>
-          <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>You have 3 assignments due this week. Keep it up!</p>
+          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: isMobile ? 20 : 26, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8 }}>Rafiq Islam 👋</h2>
+          <p style={{ fontSize: isMobile ? 13 : 14, color: 'var(--text-secondary)' }}>You have 3 assignments due this week.</p>
         </div>
-        <span className="float" style={{ fontSize: 52, marginRight: 16 }}>📖</span>
+        {!isMobile && <span className="float" style={{ fontSize: 52, marginRight: 16 }}>📖</span>}
       </div>
 
       {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 28 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4,1fr)', gap: 12, marginBottom: 20 }}>
         {stats.map(s => (
-          <div key={s.label} style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 14, padding: '18px 20px', display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-            <span style={{ fontSize: 22, flexShrink: 0, marginTop: 2 }}>{s.icon}</span>
+          <div key={s.label} style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 14, padding: isMobile ? '14px' : '18px 20px', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+            <span style={{ fontSize: isMobile ? 18 : 22, flexShrink: 0, marginTop: 2 }}>{s.icon}</span>
             <div>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 700, color: s.color, lineHeight: 1, marginBottom: 4 }}>{s.value}</div>
-              <div style={{ fontSize: 12, color: 'var(--text-secondary)', fontWeight: 500, marginBottom: 2 }}>{s.label}</div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{s.delta}</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: isMobile ? 20 : 26, fontWeight: 700, color: s.color, lineHeight: 1, marginBottom: 4 }}>{s.value}</div>
+              <div style={{ fontSize: 11, color: 'var(--text-secondary)', fontWeight: 500, marginBottom: 2 }}>{s.label}</div>
+              {!isMobile && <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{s.delta}</div>}
             </div>
           </div>
         ))}
       </div>
 
-      {/* Main 2-col */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 24, alignItems: 'start' }}>
+      {/* Main grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 320px', gap: 20 }}>
 
         {/* Courses */}
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
             <span style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 700 }}>My Courses</span>
             <Link href="/courses" style={{ fontSize: 12, color: 'var(--brand-primary)', textDecoration: 'none' }}>See all →</Link>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {courses.map(c => (
-              <Link key={c.id} href={`/courses/${c.id}`} style={{ display: 'flex', background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 12, overflow: 'hidden', textDecoration: 'none', transition: 'border-color 0.2s, transform 0.15s' }}
-                onMouseEnter={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.transform = 'translateX(3px)'; el.style.borderColor = 'var(--border-default)' }}
-                onMouseLeave={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.transform = ''; el.style.borderColor = 'var(--border-subtle)' }}>
+              <Link key={c.id} href={`/courses/${c.id}`}
+                style={{ display: 'flex', background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 12, overflow: 'hidden', textDecoration: 'none', transition: 'border-color 0.2s' }}
+                onMouseEnter={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.borderColor = 'var(--border-default)' }}
+                onMouseLeave={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.borderColor = 'var(--border-subtle)' }}>
                 <div style={{ width: 4, background: c.color, flexShrink: 0 }} />
-                <div style={{ padding: '14px 16px', flex: 1 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                    <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)' }}>{c.title}</span>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: c.color, flexShrink: 0, marginLeft: 8 }}>{c.progress}%</span>
+                <div style={{ padding: '12px 14px', flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, gap: 8 }}>
+                    <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.title}</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: c.color, flexShrink: 0 }}>{c.progress}%</span>
                   </div>
-                  <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 10 }}>{c.instructor}</p>
-                  <div style={{ height: 4, background: 'var(--bg-elevated)', borderRadius: 99, overflow: 'hidden', marginBottom: 10 }}>
+                  <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>{c.instructor}</p>
+                  <div style={{ height: 4, background: 'var(--bg-elevated)', borderRadius: 99, overflow: 'hidden', marginBottom: 8 }}>
                     <div style={{ height: '100%', width: `${c.progress}%`, background: c.color, borderRadius: 99 }} />
                   </div>
-                  <div style={{ display: 'flex', gap: 12 }}>
+                  <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                     <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>⏰ {c.deadline}</span>
-                    <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>✅ {c.done}/{c.total} modules</span>
+                    <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>✅ {c.done}/{c.total}</span>
                   </div>
                 </div>
               </Link>
@@ -94,11 +104,10 @@ export default function DashboardPage() {
         </div>
 
         {/* Right col */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {/* Deadlines */}
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
               <span style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 700 }}>Deadlines</span>
               <Link href="/calendar" style={{ fontSize: 12, color: 'var(--brand-primary)', textDecoration: 'none' }}>Calendar →</Link>
             </div>
@@ -106,9 +115,9 @@ export default function DashboardPage() {
               {deadlines.map((d, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 10, background: 'var(--bg-surface)', border: `1px solid ${d.urgent ? 'rgba(255,101,132,0.2)' : 'var(--border-subtle)'}` }}>
                   <div style={{ width: 8, height: 8, borderRadius: '50%', background: d.urgent ? '#FF6584' : '#43CFAA', flexShrink: 0 }} />
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>{d.course}</div>
-                    <div style={{ fontSize: 13, color: 'var(--text-primary)' }}>{d.task}</div>
+                    <div style={{ fontSize: 13, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{d.task}</div>
                   </div>
                   <span style={{ fontSize: 12, color: d.urgent ? '#FF6584' : 'var(--text-muted)', fontWeight: d.urgent ? 600 : 400, flexShrink: 0 }}>{d.due}</span>
                 </div>
@@ -118,13 +127,13 @@ export default function DashboardPage() {
 
           {/* Activity */}
           <div>
-            <span style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 700, display: 'block', marginBottom: 12 }}>Recent Activity</span>
+            <span style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 700, display: 'block', marginBottom: 10 }}>Recent Activity</span>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               {activity.map((a, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 0', borderBottom: i < activity.length - 1 ? '1px solid var(--border-subtle)' : 'none' }}>
                   <div style={{ width: 8, height: 8, borderRadius: '50%', background: a.dot, flexShrink: 0, marginTop: 4 }} />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, color: 'var(--text-primary)' }}>{a.text}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{a.text}</div>
                     <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{a.detail}</div>
                   </div>
                   <span style={{ fontSize: 11, color: 'var(--text-muted)', flexShrink: 0 }}>{a.time}</span>
@@ -132,16 +141,8 @@ export default function DashboardPage() {
               ))}
             </div>
           </div>
-
         </div>
       </div>
-      <style>{`
-        @media (max-width: 768px) {
-          .stats-grid { grid-template-columns: 1fr 1fr !important; }
-          .main-grid { grid-template-columns: 1fr !important; }
-          .welcome-banner { flex-direction: column !important; }
-        }
-      `}</style>
     </div>
   )
 }
